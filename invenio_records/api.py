@@ -137,6 +137,7 @@ class RecordBase(dict):
 class Record(RecordBase):
     """Define API for metadata creation and manipulation."""
 
+    system_fields = None
     model_cls = RecordMetadata
 
     @classmethod
@@ -362,6 +363,28 @@ class Record(RecordBase):
             raise MissingModelError()
 
         return RevisionsIterator(self.model)
+
+    def clear_solution1(self):
+        """Solution 1. Restore fields from self.system_fields."""
+        values = deepcopy(self)
+
+        super(Record, self).clear()
+
+        if self.system_fields:
+            for field in self.system_fields:
+                self[field] = values[field]
+
+    def after_clear(self, old_values):
+        """Executed after self.clear() runs."""
+        pass
+
+    def clear_solution2(self):
+        """Solution 2. Clear and restore using method."""
+        old_values = deepcopy(self)
+
+        super(Record, self).clear()
+
+        self.after_clear(old_values)
 
 
 class RecordRevision(RecordBase):
